@@ -1,0 +1,93 @@
+from collections import Counter
+from typing import List, Dict, Tuple
+
+def top_3_objetos_mas_vendidos(ventas: List[Dict[str, int]]) -> List[Tuple[str, int]]:
+    """
+    Devuelve una lista con los top 3 productos más vendidos.
+    Cada elemento de la lista de entrada 'ventas' debe ser un diccionario
+    con al menos las claves: 'producto' (str) y 'cantidad' (int).
+    Resultado: lista de tuplas (producto, cantidad_total) ordenada de mayor a menor.
+    """
+
+    # 1) Uso de Counter para acumular cantidades por producto
+    acumulador = Counter()   # crea un contador vacío
+
+    # 2) Recorremos todas las ventas y sumamos cantidades al contador
+    for venta in ventas:
+        producto = venta.get('producto')          # extrae nombre del producto de la venta
+        cantidad = int(venta.get('cantidad', 0))  # extrae la cantidad (por seguridad convierto a int)
+        acumulador[producto] += cantidad         # añade la cantidad al total del producto
+
+    # 3) Obtener los elementos más comunes (top n)
+    top_n = acumulador.most_common(3)   # devuelve lista de tuplas (producto, cantidad_total)
+
+    # 4) Devolver top 3 (si hay menos de 3 productos devuelve los que existan)
+    return top_n
+Ahora un ejemplo práctico y la salida esperada:
+
+python
+Copiar código
+# ejemplo de ventas
+ventas = [
+    {'producto': 'Cargador USB',    'cantidad': 2},
+    {'producto': 'Audífonos',       'cantidad': 1},
+    {'producto': 'Cargador USB',    'cantidad': 1},
+    {'producto': 'Protector pantalla', 'cantidad': 5},
+    {'producto': 'Audífonos',       'cantidad': 3},
+    {'producto': 'Cable HDMI',      'cantidad': 4},
+    {'producto': 'Protector pantalla', 'cantidad': 1},
+]
+
+resultado = top_3_objetos_mas_vendidos(ventas)
+print(resultado)
+# Salida esperada: [('Protector pantalla', 6), ('Cable HDMI', 4), ('Audífonos', 4)]
+# Nota: Si hay empate en cantidades, Counter.most_common mantiene un orden arbitrario entre los empatados.
+Explicación línea por línea (detallada)
+from collections import Counter
+
+Importo Counter, una clase que facilita contar y acumular elementos (como un diccionario especializado).
+
+from typing import List, Dict, Tuple
+
+Importo tipos para documentación y claridad: List, Dict, Tuple. No son obligatorios, ayudan a entender los parámetros y el retorno.
+
+def top_3_objetos_mas_vendidos(ventas: List[Dict[str, int]]) -> List[Tuple[str, int]]:
+
+Definición de la función. ventas es una lista de diccionarios; la función devuelve una lista de tuplas (producto, cantidad_total).
+
+acumulador = Counter()
+
+Creo un Counter vacío que va a acumular la cantidad total vendida por cada producto (clave = nombre del producto).
+
+for venta in ventas:
+
+Inicia un bucle que recorre cada registro de venta en la lista ventas.
+
+producto = venta.get('producto')
+
+Extrae el nombre del producto de la venta. Uso get por seguridad (evita KeyError si faltara la clave).
+
+cantidad = int(venta.get('cantidad', 0))
+
+Obtiene la cantidad vendida en ese registro. Si no está, uso 0. Convierto a int para estar seguro del tipo.
+
+acumulador[producto] += cantidad
+
+Sumo la cantidad al total acumulado del producto en el Counter. Si el producto no existía, se crea automáticamente.
+
+top_n = acumulador.most_common(3)
+
+most_common(3) devuelve una lista con las 3 parejas (producto, cantidad_total) con mayor cantidad, en orden descendente.
+
+return top_n
+
+Devuelvo la lista con los top 3. Si tuvieras menos de 3 productos, devuelve los que existan.
+
+Notas y mejoras posibles
+Si quieres romper empates de forma determinística (por ejemplo, por orden alfabético), podemos ordenar acumulador.items() con una clave que considere cantidad descendente y nombre ascendente.
+
+Si tus ventas están registradas por producto (no por venta) —por ejemplo un catálogo con {'producto': 'X', 'vendidos': 10}— basta con adaptar la entrada o hacer un preprocesamiento similar.
+
+Implementación equivalente en PHP o JavaScript si prefieres (dime cuál y te la traduzco).
+
+Complejidad: O(n) para acumular + O(k log k) para ordenar (k = #productos). Counter.most_common(3) es eficiente para k grande porque no ordena todo si no hace falta.
